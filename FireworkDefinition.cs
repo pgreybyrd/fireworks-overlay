@@ -43,4 +43,8 @@ public class FireworkDefinition
     public bool HasTrail { get; set; } = true;
 
     public float Gravity { get; set; } = 0.045f;
+
+    public string? LaunchSound;
+    public string? ExplosionSound;
+    public string? CrackleSound;
 }
