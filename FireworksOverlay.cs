@@ -56,7 +56,7 @@ public class FireworksForm : Form
         {
             FireworkType type = (FireworkType)_random.Next(5);
 
-            LaunchFirework(e.X, e.Y, type);
+            LaunchFirework(e.X, e.Y, CreateRandomDefinition());
         };
     }
 
@@ -68,16 +68,14 @@ public class FireworksForm : Form
 
         if (_timeUntilNextLaunchMs <= 0)
         {
-            int bursts = _random.Next(1, 4); // sometimes multiple!
+            int bursts = _random.Next(1, 4);
 
             for (int i = 0; i < bursts; i++)
             {
                 int x = _random.Next(100, Width - 100);
-                int y = _random.Next(80, Height / 2);
+                int targetY = _random.Next(80, Height / 2);
 
-                FireworkType type = (FireworkType)_random.Next(5);
-
-                LaunchFirework(x, y, type);
+                LaunchShell(x, Height - 40, targetY);
             }
 
             _timeUntilNextLaunchMs = _random.Next(600, 5000);
@@ -90,29 +88,49 @@ public class FireworksForm : Form
             p.X += p.VX;
             p.Y += p.VY;
 
-            p.VY += p.IsShell ? 0.025f : 0.045f; // gravity
+            p.VY += p.IsShell ? 0.025f : (p.Definition?.Gravity ?? 0.045f);
             p.VX *= 0.992f;
             p.VY *= 0.992f;
 
-            if (p.IsShell && !p.HasExploded && p.Y <= p.TargetY)
+            if (p.Definition?.Type == FireworkType.Willow)
             {
-                p.HasExploded = true;
-                LaunchFirework(p.X, p.Y, p.FireworkType);
-                _particles.RemoveAt(i);
-                continue;
-            }
-
-            if (!p.IsShell && !p.IsSparkle && p.Life < p.MaxLife * 0.35f && _random.NextDouble() < 0.008)
-            {
-                AddSparkle(p.X, p.Y, p.Color);
+                p.VX *= 0.985f;
+                p.VY += 0.025f;
             }
 
             if (p.IsShell && !p.HasExploded && (p.Y <= p.TargetY || p.VY >= 0))
             {
                 p.HasExploded = true;
-                LaunchFirework(p.X, p.Y, p.FireworkType);
+                LaunchFirework(p.X, p.Y, p.Definition ?? CreateRandomDefinition());
                 _particles.RemoveAt(i);
                 continue;
+            }
+
+            if (p.CanReexplode && !p.HasReexploded && p.Life < p.MaxLife * 0.45f)
+            {
+                p.HasReexploded = true;
+
+                FireworkDefinition mini = new()
+                {
+                    Type = FireworkType.Burst,
+                    Palette = p.Definition?.Palette ?? FireworkPalette.Gold,
+                    MinLife = 500,
+                    MaxLife = 1000,
+                    MinSpeed = 0.8f,
+                    MaxSpeed = 2.2f,
+                    HasSparkles = false
+                };
+
+                LaunchFirework(p.X, p.Y, mini);
+            }
+
+            if (p.Definition?.HasCrackle == true && _random.NextDouble() < 0.015)
+                AddSparkle(p.X, p.Y, Color.White);
+
+            if (!p.IsShell && !p.IsSparkle && p.Definition?.HasSparkles == true &&
+                p.Life < p.MaxLife * 0.35f && _random.NextDouble() < 0.008)
+            {
+                AddSparkle(p.X, p.Y, p.Color);
             }
 
             p.Life -= dt;
@@ -159,6 +177,7 @@ public class FireworksForm : Form
             VY = -upwardSpeed,
 
             FireworkType = (FireworkType)_random.Next(5),
+            Definition = CreateRandomDefinition(),
 
             Life = 3000,
             MaxLife = 3000,
@@ -169,40 +188,32 @@ public class FireworksForm : Form
         });
     }
 
-    private void LaunchFirework(float x, float y, FireworkType type)
+    private void LaunchFirework(float x, float y, FireworkDefinition def)
     {
-        Color[][] palettes =
-        {
-        new[] { Color.Gold, Color.Orange, Color.White, Color.Yellow },
-        new[] { Color.Red, Color.OrangeRed, Color.Gold, Color.White },
-        new[] { Color.DeepSkyBlue, Color.Cyan, Color.White, Color.LightSteelBlue },
-        new[] { Color.MediumPurple, Color.Violet, Color.White, Color.HotPink },
-        new[] { Color.HotPink, Color.DeepPink, Color.White, Color.Pink },
-        new[] { Color.LimeGreen, Color.SpringGreen, Color.White, Color.Cyan },
-        new[] { Color.Red, Color.Orange, Color.Yellow, Color.LimeGreen, Color.DeepSkyBlue, Color.MediumPurple, Color.HotPink, Color.White },
-        new[] { Color.White, Color.Gainsboro, Color.LightYellow }
-        };
+        Color[] palette = GetPalette(def.Palette);
 
-        Color[] palette = _random.Next(5) == 0
-            ? palettes[6] // rainbow
-            : palettes[_random.Next(palettes.Length)];
-
-        switch (type)
+        switch (def.Type)
         {
             case FireworkType.Burst:
-                CreateBurst(x, y, palette);
+                CreateBurst(x, y, def, palette);
                 break;
-
             case FireworkType.Ring:
-                CreateRing(x, y, palette);
+                CreateRing(x, y, def, palette);
                 break;
-
             case FireworkType.Chrysanthemum:
-                CreateChrysanthemum(x, y, palette);
+                CreateChrysanthemum(x, y, def, palette);
                 break;
-
             case FireworkType.Willow:
-                CreateWillow(x, y, palette);
+                CreateWillow(x, y, def, palette);
+                break;
+            case FireworkType.DoubleBurst:
+                CreateDoubleBurst(x, y, def, palette);
+                break;
+            case FireworkType.Crackle:
+                CreateCrackle(x, y, def, palette);
+                break;
+            case FireworkType.Comet:
+                CreateComet(x, y, def, palette);
                 break;
         }
     }
@@ -220,15 +231,12 @@ public class FireworksForm : Form
     }
 
     private void AddExplosionParticle(
-        float x,
-        float y,
-        float vx,
-        float vy,
-        int life,
-        int maxLife,
-        float size,
+        float x, float y,
+        float vx, float vy,
+        FireworkDefinition def,
         Color color,
-        ParticleShape shape)
+        ParticleShape shape,
+        bool canReexplode = false)
     {
         _particles.Add(new Particle
         {
@@ -236,97 +244,157 @@ public class FireworksForm : Form
             Y = y,
             VX = vx,
             VY = vy,
-            Life = life,
-            MaxLife = maxLife,
-            Size = size,
+            Life = _random.Next(def.MinLife, def.MaxLife),
+            MaxLife = def.MaxLife,
+            Size = _random.Next(2, 6),
             Color = color,
-            Shape = shape
+            Shape = shape,
+            Definition = def,
+            CanReexplode = canReexplode
         });
     }
 
-    private void CreateBurst(float x, float y, Color[] palette)
+    private void CreateBurst(float x, float y, FireworkDefinition def, Color[] palette)
     {
         int count = _random.Next(70, 130);
 
         for (int i = 0; i < count; i++)
         {
             double angle = _random.NextDouble() * Math.PI * 2;
-            double speed = 1.5 + _random.NextDouble() * 5.8;
+            double speed = def.MinSpeed + _random.NextDouble() * (def.MaxSpeed - def.MinSpeed);
 
-            AddExplosionParticle(
-                x, y,
+            AddExplosionParticle(x, y,
                 (float)(Math.Cos(angle) * speed),
                 (float)(Math.Sin(angle) * speed),
-                _random.Next(1200, 2400),
-                2400,
-                _random.Next(2, 6),
+                def,
                 PickColor(palette, i),
                 PickShape());
         }
     }
 
-    private void CreateRing(float x, float y, Color[] palette)
+    private void CreateRing(float x, float y, FireworkDefinition def, Color[] palette)
     {
-        int count = _random.Next(70, 110);
-        double baseSpeed = 4.0 + _random.NextDouble() * 1.5;
+        int count = _random.Next(80, 120);
+        double baseSpeed = 4.2 + _random.NextDouble();
 
         for (int i = 0; i < count; i++)
         {
-            double angle = Math.PI * 2 * i / count;
-            double speed = baseSpeed + _random.NextDouble() * 0.3;
+            double angle = Math.PI * 2 * i / count + (_random.NextDouble() - 0.5) * 0.05;
+            double speed = baseSpeed + (_random.NextDouble() - 0.5) * 0.3;
 
-            AddExplosionParticle(
-                x, y,
+            AddExplosionParticle(x, y,
                 (float)(Math.Cos(angle) * speed),
                 (float)(Math.Sin(angle) * speed),
-                _random.Next(1300, 2200),
-                2200,
-                _random.Next(2, 5),
+                def,
                 PickColor(palette, i),
                 PickShape());
         }
     }
 
-    private void CreateChrysanthemum(float x, float y, Color[] palette)
+    private void CreateChrysanthemum(float x, float y, FireworkDefinition def, Color[] palette)
     {
-        int count = _random.Next(120, 190);
+        int count = _random.Next(140, 220);
 
         for (int i = 0; i < count; i++)
         {
-            double angle = Math.PI * 2 * i / count + (_random.NextDouble() * 0.08);
-            double speed = 2.2 + _random.NextDouble() * 4.2;
+            double angle = Math.PI * 2 * i / count + _random.NextDouble() * 0.08;
+            double speed = 2.0 + _random.NextDouble() * 4.2;
 
-            AddExplosionParticle(
-                x, y,
+            AddExplosionParticle(x, y,
                 (float)(Math.Cos(angle) * speed),
                 (float)(Math.Sin(angle) * speed),
-                _random.Next(1500, 2800),
-                2800,
-                _random.Next(2, 6),
+                def,
                 PickColor(palette, i),
                 PickShape());
         }
     }
 
-    private void CreateWillow(float x, float y, Color[] palette)
+    private void CreateWillow(float x, float y, FireworkDefinition def, Color[] palette)
     {
-        int count = _random.Next(80, 130);
+        int count = _random.Next(90, 140);
+
+        def.MinLife = 2600;
+        def.MaxLife = 4600;
+        def.Gravity = 0.07f;
 
         for (int i = 0; i < count; i++)
         {
-            double angle = Math.PI * 2 * i / count + _random.NextDouble() * 0.1;
-            double speed = 1.4 + _random.NextDouble() * 2.2;
+            double angle = Math.PI * 2 * i / count + _random.NextDouble() * 0.08;
+            double speed = 1.3 + _random.NextDouble() * 2.0;
 
-            AddExplosionParticle(
-                x, y,
+            AddExplosionParticle(x, y,
                 (float)(Math.Cos(angle) * speed),
-                (float)(Math.Sin(angle) * speed - 1.2f),
-                _random.Next(2400, 4200),
-                4200,
-                _random.Next(2, 5),
+                (float)(Math.Sin(angle) * speed - 1.1f),
+                def,
                 PickColor(palette, i),
                 ParticleShape.Plus);
         }
+    }
+
+    private void CreateDoubleBurst(float x, float y, FireworkDefinition def, Color[] palette)
+    {
+        int count = _random.Next(70, 110);
+
+        for (int i = 0; i < count; i++)
+        {
+            double angle = _random.NextDouble() * Math.PI * 2;
+            double speed = 1.6 + _random.NextDouble() * 4.0;
+
+            AddExplosionParticle(x, y,
+                (float)(Math.Cos(angle) * speed),
+                (float)(Math.Sin(angle) * speed),
+                def,
+                PickColor(palette, i),
+                PickShape(),
+                canReexplode: _random.NextDouble() < 0.25);
+        }
+    }
+
+    private void CreateCrackle(float x, float y, FireworkDefinition def, Color[] palette)
+    {
+        def.HasCrackle = true;
+        def.MinLife = 1200;
+        def.MaxLife = 2600;
+
+        CreateChrysanthemum(x, y, def, palette);
+    }
+
+    private void CreateComet(float x, float y, FireworkDefinition def, Color[] palette)
+    {
+        int cometCount = _random.Next(4, 8);
+
+        for (int c = 0; c < cometCount; c++)
+        {
+            float offsetX = (float)(_random.NextDouble() * 160 - 80);
+            float offsetY = (float)(_random.NextDouble() * 80 - 40);
+
+            CreateBurst(x + offsetX, y + offsetY, def, palette);
+        }
+    }
+
+    private FireworkDefinition CreateRandomDefinition()
+    {
+        return new FireworkDefinition
+        {
+            Type = (FireworkType)_random.Next(Enum.GetValues<FireworkType>().Length),
+            Palette = (FireworkPalette)_random.Next(Enum.GetValues<FireworkPalette>().Length)
+        };
+    }
+
+    private Color[] GetPalette(FireworkPalette palette)
+    {
+        return palette switch
+        {
+            FireworkPalette.Gold => new[] { Color.Gold, Color.Orange, Color.White, Color.Yellow },
+            FireworkPalette.RedGold => new[] { Color.Red, Color.OrangeRed, Color.Gold, Color.White },
+            FireworkPalette.Ice => new[] { Color.DeepSkyBlue, Color.Cyan, Color.White, Color.LightSteelBlue },
+            FireworkPalette.Purple => new[] { Color.MediumPurple, Color.Violet, Color.White, Color.HotPink },
+            FireworkPalette.Pink => new[] { Color.HotPink, Color.DeepPink, Color.White, Color.Pink },
+            FireworkPalette.Green => new[] { Color.LimeGreen, Color.SpringGreen, Color.White, Color.Cyan },
+            FireworkPalette.Rainbow => new[] { Color.Red, Color.Orange, Color.Yellow, Color.LimeGreen, Color.DeepSkyBlue, Color.MediumPurple, Color.HotPink, Color.White },
+            FireworkPalette.WhiteGlitter => new[] { Color.White, Color.Gainsboro, Color.LightYellow },
+            _ => new[] { Color.White }
+        };
     }
 
     protected override void OnPaint(PaintEventArgs e)
