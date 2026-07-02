@@ -9,6 +9,8 @@ namespace FireworksOverlay;
 
 public class FireworksForm : Form
 {
+    private bool _glowEnabled = true;
+
     private readonly List<Particle> _particles = new();
     private readonly Random _random = new();
     private readonly System.Windows.Forms.Timer _timer = new();
@@ -75,6 +77,9 @@ public class FireworksForm : Form
 
             if (e.KeyCode == Keys.T)
                 TopMost = !TopMost;
+
+            if (e.KeyCode == Keys.G)
+                _glowEnabled = !_glowEnabled;
         };
 
         MouseDown += (_, e) =>
@@ -83,6 +88,36 @@ public class FireworksForm : Form
 
             LaunchFirework(e.X, e.Y, CreateRandomDefinition());
         };
+    }
+
+    private void DrawParticleGlow(Graphics g, Particle p, Color glowColor, int alpha)
+    {
+        if (!_glowEnabled || p.Shape == ParticleShape.Shell)
+            return;
+
+        float lifePercent = Math.Max(0, p.Life / p.MaxLife);
+
+        if (lifePercent < 0.35f)
+            return;
+
+        int glowAlpha = (int)(alpha * 0.35f);
+        float s = p.Size * 3.5f;
+
+        using Pen glowPen = new(Color.FromArgb(glowAlpha, glowColor), 1);
+
+        g.DrawLine(glowPen, p.X - s, p.Y, p.X + s, p.Y);
+        g.DrawLine(glowPen, p.X, p.Y - s, p.X, p.Y + s);
+
+        using Pen faintPen = new(Color.FromArgb(glowAlpha / 2, glowColor), 1);
+
+        g.DrawLine(faintPen, p.X - s * 0.7f, p.Y - s * 0.7f, p.X + s * 0.7f, p.Y + s * 0.7f);
+        g.DrawLine(faintPen, p.X - s * 0.7f, p.Y + s * 0.7f, p.X + s * 0.7f, p.Y - s * 0.7f);
+    }
+
+    private void DrawGlowCircle(Graphics g, float x, float y, float size, Color color)
+    {
+        using Brush brush = new SolidBrush(color);
+        g.FillEllipse(brush, x - size / 2, y - size / 2, size, size);
     }
 
     private void CreateMenu()
@@ -830,6 +865,8 @@ public class FireworksForm : Form
             Color displayColor = BlendColors(p.StartColor == Color.Empty ? p.Color : p.StartColor,
                                              p.EndColor == Color.Empty ? p.Color : p.EndColor,
                                              fadeAmount);
+
+            DrawParticleGlow(e.Graphics, p, displayColor, alpha);
 
             using var pen = new Pen(Color.FromArgb(alpha, displayColor), 2);
             using var brush = new SolidBrush(Color.FromArgb(alpha, displayColor));
