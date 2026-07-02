@@ -325,13 +325,6 @@ public class FireworksForm : Form
         }
     }
 
-    private Color PickColor(Color[] palette, int index)
-    {
-        return index < 4
-            ? Color.White
-            : palette[_random.Next(palette.Length)];
-    }
-
     private ParticleShape PickShape()
     {
         return (ParticleShape)_random.Next(0, 3);
@@ -374,7 +367,7 @@ public class FireworksForm : Form
                 (float)(Math.Cos(angle) * speed),
                 (float)(Math.Sin(angle) * speed),
                 def,
-                PickColor(palette, i),
+                PickFireworkColor(def, palette, i, count, angle, speed, def.MaxSpeed),
                 PickShape());
         }
     }
@@ -393,7 +386,7 @@ public class FireworksForm : Form
                 (float)(Math.Cos(angle) * speed),
                 (float)(Math.Sin(angle) * speed),
                 def,
-                PickColor(palette, i),
+                PickFireworkColor(def, palette, i, count, angle, speed, baseSpeed + 0.5),
                 PickShape());
         }
     }
@@ -411,7 +404,7 @@ public class FireworksForm : Form
                 (float)(Math.Cos(angle) * speed),
                 (float)(Math.Sin(angle) * speed),
                 def,
-                PickColor(palette, i),
+                PickFireworkColor(def, palette, i, count, angle, speed, def.MaxSpeed),
                 PickShape());
         }
     }
@@ -433,7 +426,7 @@ public class FireworksForm : Form
                 (float)(Math.Cos(angle) * speed),
                 (float)(Math.Sin(angle) * speed - 1.1f),
                 def,
-                PickColor(palette, i),
+                PickFireworkColor(def, palette, i, count, angle, speed, def.MaxSpeed),
                 ParticleShape.Plus);
         }
     }
@@ -451,7 +444,7 @@ public class FireworksForm : Form
                 (float)(Math.Cos(angle) * speed),
                 (float)(Math.Sin(angle) * speed),
                 def,
-                PickColor(palette, i),
+                PickFireworkColor(def, palette, i, count, angle, speed, def.MaxSpeed),
                 PickShape(),
                 canReexplode: _random.NextDouble() < 0.25);
         }
@@ -485,9 +478,32 @@ public class FireworksForm : Form
     {
         return new FireworkDefinition
         {
+            ColorStyle = PickRandomColorStyle(),
             Type = (FireworkType)_random.Next(Enum.GetValues<FireworkType>().Length),
             Palette = (FireworkPalette)_random.Next(Enum.GetValues<FireworkPalette>().Length)
         };
+    }
+
+    private ColorStyle PickRandomColorStyle()
+    {
+        double roll = _random.NextDouble();
+
+        if (roll < 0.55)
+            return ColorStyle.Mixed;          // rainbow soup favorite
+
+        if (roll < 0.62)
+            return ColorStyle.Balanced;       // nice two-color blend
+
+        if (roll < 0.76)
+            return ColorStyle.CoreToEdge;     // structured shell
+
+        if (roll < 0.86)
+            return ColorStyle.SplitHorizontal;
+
+        if (roll < 0.96)
+            return ColorStyle.SplitVertical;
+
+        return ColorStyle.Uniform;            // rare mostly-one-color
     }
 
     private Color[] GetPalette(FireworkPalette palette)
@@ -690,6 +706,71 @@ public class FireworksForm : Form
 
             _ => new[] { Color.White }
         };
+    }
+
+    private Color PickFireworkColor(
+        FireworkDefinition def,
+        Color[] palette,
+        int index,
+        int count,
+        double angle,
+        double speed,
+        double maxSpeed)
+    {
+        Color primary = def.PrimaryColor;
+        Color accent = def.AccentColor;
+
+        if (primary == Color.Empty || accent == Color.Empty)
+        {
+            primary = palette[_random.Next(palette.Length)];
+            accent = palette[_random.Next(palette.Length)];
+
+            if (accent == primary && palette.Length > 1)
+                accent = palette[(_random.Next(palette.Length - 1) + 1) % palette.Length];
+
+            def.PrimaryColor = primary;
+            def.AccentColor = accent;
+        }
+
+        // tiny bright core
+        if (index < count * 0.05)
+            return Color.White;
+
+        return def.ColorStyle switch
+        {
+            ColorStyle.Uniform => PickWeighted(primary, accent, palette, 0.78, 0.17),
+
+            ColorStyle.Balanced => PickWeighted(primary, accent, palette, 0.45, 0.40),
+
+            ColorStyle.Mixed => palette[_random.Next(palette.Length)],
+
+            ColorStyle.SplitHorizontal => Math.Sin(angle) < 0
+                ? primary
+                : accent,
+
+            ColorStyle.SplitVertical => Math.Cos(angle) < 0
+                ? primary
+                : accent,
+
+            ColorStyle.CoreToEdge => speed < maxSpeed * 0.55
+                ? primary
+                : accent,
+
+            _ => PickWeighted(primary, accent, palette, 0.55, 0.30)
+        };
+    }
+
+    private Color PickWeighted(Color primary, Color accent, Color[] palette, double primaryChance, double accentChance)
+    {
+        double roll = _random.NextDouble();
+
+        if (roll < primaryChance)
+            return primary;
+
+        if (roll < primaryChance + accentChance)
+            return accent;
+
+        return palette[_random.Next(palette.Length)];
     }
 
     private void DrawSignature(Graphics g)

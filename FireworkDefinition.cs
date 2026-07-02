@@ -39,6 +39,18 @@ public enum FireworkPalette
     AuroraBorealis
 }
 
+public enum ColorStyle
+{
+    Uniform,        // mostly one color
+    Balanced,       // two colors
+    Mixed,          // lots of colors
+    Gradient,       // coming soon!
+    CoreFlash,      // bright white center
+    SplitHorizontal,// two colors split horizontally
+    SplitVertical,  // two colors split vertically
+    CoreToEdge,     // bright center fading to edges
+}
+
 public class FireworkDefinition
 {
     public FireworkType Type { get; set; }
@@ -64,5 +76,7 @@ public class FireworkDefinition
     public string? ExplosionSound { get; set; }
     public string? CrackleSound { get; set; }
 
-
+    public ColorStyle ColorStyle { get; set; } = ColorStyle.Balanced;
+    public Color PrimaryColor { get; set; } = Color.Empty;
+    public Color AccentColor { get; set; } = Color.Empty;
 }
