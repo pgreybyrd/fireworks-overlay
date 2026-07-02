@@ -8,4 +8,154 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Sounds\Crackle\crackl03.wav" />
+    <None Remove="Sounds\Crackle\crackle01.wav" />
+    <None Remove="Sounds\Crackle\crackle02.wav" />
+    <None Remove="Sounds\Crackle\crackle04.wav" />
+    <None Remove="Sounds\Crackle\crackle05.wav" />
+    <None Remove="Sounds\Explosion\boom01.wav" />
+    <None Remove="Sounds\Explosion\boom02.wav" />
+    <None Remove="Sounds\Explosion\boom03.wav" />
+    <None Remove="Sounds\Explosion\boom04.wav" />
+    <None Remove="Sounds\Explosion\boom05.wav" />
+    <None Remove="Sounds\Explosion\boom06.wav" />
+    <None Remove="Sounds\Explosion\boom07.wav" />
+    <None Remove="Sounds\Explosion\boom08.wav" />
+    <None Remove="Sounds\Explosion\boom09.wav" />
+    <None Remove="Sounds\Explosion\boom10.wav" />
+    <None Remove="Sounds\Explosion\boom11.wav" />
+    <None Remove="Sounds\Explosion\boom12.wav" />
+    <None Remove="Sounds\Explosion\boom13.wav" />
+    <None Remove="Sounds\Explosion\boom14.wav" />
+    <None Remove="Sounds\Explosion\boom15.wav" />
+    <None Remove="Sounds\Explosion\boom16.wav" />
+    <None Remove="Sounds\Explosion\boom17.wav" />
+    <None Remove="Sounds\Finale\hugeboom01.wav" />
+    <None Remove="Sounds\Finale\hugeboom02.wav" />
+    <None Remove="Sounds\Finale\hugeboom03.wav" />
+    <None Remove="Sounds\Launch\launch01.wav" />
+    <None Remove="Sounds\Launch\launch02.wav" />
+    <None Remove="Sounds\Launch\launch03.wav" />
+    <None Remove="Sounds\Launch\launch04.wav" />
+    <None Remove="Sounds\Launch\launch05.wav" />
+    <None Remove="Sounds\Launch\launch06.wav" />
+    <None Remove="Sounds\Launch\launch07.wav" />
+    <None Remove="Sounds\Launch\launch08.wav" />
+    <None Remove="Sounds\Launch\launch09.wav" />
+    <None Remove="Sounds\Launch\launch10.wav" />
+    <None Remove="Sounds\Launch\launch11.wav" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Sounds\Crackle\crackl03.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Crackle\crackle01.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Crackle\crackle02.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Crackle\crackle04.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Crackle\crackle05.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom01.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom02.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom03.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom04.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom05.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom06.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom07.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom08.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom09.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom10.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom11.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom12.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom13.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom14.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom15.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom16.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Explosion\boom17.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Finale\hugeboom01.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Finale\hugeboom02.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Finale\hugeboom03.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch01.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch02.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch03.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch04.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch05.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch06.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch07.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch08.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch09.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch10.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Launch\launch11.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

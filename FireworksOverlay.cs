@@ -49,6 +49,8 @@ public class FireworksForm : Form
 
         //CreateMenu();
 
+        //SoundManager.load
+
         KeyDown += (_, e) =>
         {
             if (e.KeyCode == Keys.Escape)
@@ -59,6 +61,7 @@ public class FireworksForm : Form
                 int x = _random.Next(100, Width - 100);
                 int targetY = _random.Next(80, Height / 2);
                 LaunchShell(x, Height - 40, targetY);
+                SoundManager.PlayLaunch();
             }
 
             if (e.KeyCode == Keys.P)
@@ -168,6 +171,7 @@ public class FireworksForm : Form
                 int targetY = _random.Next(80, Height / 2);
 
                 LaunchShell(x, Height - 40, targetY);
+                SoundManager.PlayFinale();
             }
 
             _timeUntilNextLaunchMs = _finaleMode
@@ -196,6 +200,7 @@ public class FireworksForm : Form
             {
                 p.HasExploded = true;
                 LaunchFirework(p.X, p.Y, p.Definition ?? CreateRandomDefinition());
+                SoundManager.PlayExplosion();
                 _particles.RemoveAt(i);
                 continue;
             }
@@ -216,6 +221,7 @@ public class FireworksForm : Form
                 };
 
                 LaunchFirework(p.X, p.Y, mini);
+                SoundManager.PlayExplosion();
             }
 
             if (p.Definition?.HasCrackle == true && _random.NextDouble() < 0.015)

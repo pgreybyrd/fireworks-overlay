@@ -41,10 +41,14 @@ public class FireworkDefinition
     public bool HasCrackle { get; set; }
     public bool HasDoubleBurst { get; set; }
     public bool HasTrail { get; set; } = true;
+    public bool IsFinale { get; set; } = false;
+    public bool HasWhistle { get; set; } = false;
 
     public float Gravity { get; set; } = 0.045f;
 
-    public string? LaunchSound;
-    public string? ExplosionSound;
-    public string? CrackleSound;
+    public string? LaunchSound { get; set; }
+    public string? ExplosionSound { get; set; }
+    public string? CrackleSound { get; set; }
+
+
 }
