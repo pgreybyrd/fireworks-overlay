@@ -12,8 +12,11 @@
     <None Remove="Sounds\Crackle\crackl03.wav" />
     <None Remove="Sounds\Crackle\crackle01.wav" />
     <None Remove="Sounds\Crackle\crackle02.wav" />
+    <None Remove="Sounds\Crackle\crackle03.wav" />
     <None Remove="Sounds\Crackle\crackle04.wav" />
     <None Remove="Sounds\Crackle\crackle05.wav" />
+    <None Remove="Sounds\Crackle\crackle06.wav" />
+    <None Remove="Sounds\Crackle\crackle07.wav" />
     <None Remove="Sounds\Explosion\boom01.wav" />
     <None Remove="Sounds\Explosion\boom02.wav" />
     <None Remove="Sounds\Explosion\boom03.wav" />
@@ -48,19 +51,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Sounds\Crackle\crackl03.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Sounds\Crackle\crackle01.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Sounds\Crackle\crackle02.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Sounds\Crackle\crackle03.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Sounds\Crackle\crackle04.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Sounds\Crackle\crackle05.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Crackle\crackle06.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Crackle\crackle07.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Sounds\Explosion\boom01.wav">
@@ -156,6 +165,10 @@
     <Content Include="Sounds\Launch\launch11.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.3.0" />
   </ItemGroup>
 
 </Project>

@@ -61,7 +61,7 @@ public class FireworksForm : Form
                 int x = _random.Next(100, Width - 100);
                 int targetY = _random.Next(80, Height / 2);
                 LaunchShell(x, Height - 40, targetY);
-                SoundManager.PlayLaunch();
+
             }
 
             if (e.KeyCode == Keys.P)
@@ -171,7 +171,6 @@ public class FireworksForm : Form
                 int targetY = _random.Next(80, Height / 2);
 
                 LaunchShell(x, Height - 40, targetY);
-                SoundManager.PlayFinale();
             }
 
             _timeUntilNextLaunchMs = _finaleMode
@@ -199,8 +198,14 @@ public class FireworksForm : Form
             if (p.IsShell && !p.HasExploded && (p.Y <= p.TargetY || p.VY >= 0))
             {
                 p.HasExploded = true;
+
+                if (_finaleMode && _random.NextDouble() < 0.25)
+                    SoundManager.PlayFinale();
+                else
+                    SoundManager.PlayExplosion();
+
                 LaunchFirework(p.X, p.Y, p.Definition ?? CreateRandomDefinition());
-                SoundManager.PlayExplosion();
+
                 _particles.RemoveAt(i);
                 continue;
             }
@@ -220,8 +225,9 @@ public class FireworksForm : Form
                     HasSparkles = false
                 };
 
-                LaunchFirework(p.X, p.Y, mini);
                 SoundManager.PlayExplosion();
+
+                LaunchFirework(p.X, p.Y, mini);
             }
 
             if (p.Definition?.HasCrackle == true && _random.NextDouble() < 0.015)
@@ -266,6 +272,7 @@ public class FireworksForm : Form
         // Bigger distance = stronger launch
         float upwardSpeed = (float)Math.Sqrt(distance * 0.32f);
 
+        SoundManager.PlayLaunch();
 
         _particles.Add(new Particle
         {
@@ -456,6 +463,8 @@ public class FireworksForm : Form
         def.MinLife = 1200;
         def.MaxLife = 2600;
 
+        SoundManager.PlayCrackle();
+
         CreateChrysanthemum(x, y, def, palette);
     }
 
@@ -497,6 +506,21 @@ public class FireworksForm : Form
         };
     }
 
+    private void DrawSignature(Graphics g)
+    {
+        string text = "Paulina's Fireworks";
+
+        using Font font = new("Segoe UI", 14, FontStyle.Regular);
+        using Brush brush = new SolidBrush(Color.FromArgb(55, Color.White));
+
+        SizeF size = g.MeasureString(text, font);
+
+        float x = Width - size.Width - 24;
+        float y = Height - size.Height - 24;
+
+        g.DrawString(text, font, brush, x, y);
+    }
+
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
@@ -512,6 +536,8 @@ public class FireworksForm : Form
             using var brush = new SolidBrush(Color.FromArgb(alpha, p.Color));
 
             float s = p.Size;
+
+            DrawSignature(e.Graphics);
 
             switch (p.Shape)
             {
@@ -536,6 +562,8 @@ public class FireworksForm : Form
                     e.Graphics.DrawLine(pen, p.X, p.Y + 4, p.X, p.Y + 18);
                     break;
             }
+
+            
         }
     }
 }
