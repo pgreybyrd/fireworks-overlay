@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace FireworksOverlay;
 
@@ -12,13 +13,21 @@ public class FireworksForm : Form
     private readonly Random _random = new();
     private readonly System.Windows.Forms.Timer _timer = new();
 
+    private bool _isPaused;
+    private bool _finaleMode;
+
     private int _timeUntilNextLaunchMs;
 
     public FireworksForm()
     {
         FormBorderStyle = FormBorderStyle.None;
         StartPosition = FormStartPosition.Manual;
-        Bounds = Screen.PrimaryScreen.Bounds;
+
+        Screen targetScreen = Screen.AllScreens
+            .OrderByDescending(s => s.Bounds.Height)
+            .First();
+
+        Bounds = targetScreen.Bounds;
 
         TopMost = true;
         ShowInTaskbar = false;
@@ -38,6 +47,8 @@ public class FireworksForm : Form
         int x = _random.Next(100, Width - 100);
         int y = _random.Next(80, Height / 2);
 
+        //CreateMenu();
+
         KeyDown += (_, e) =>
         {
             if (e.KeyCode == Keys.Escape)
@@ -47,9 +58,20 @@ public class FireworksForm : Form
             {
                 int x = _random.Next(100, Width - 100);
                 int targetY = _random.Next(80, Height / 2);
-
                 LaunchShell(x, Height - 40, targetY);
             }
+
+            if (e.KeyCode == Keys.P)
+                _isPaused = !_isPaused;
+
+            if (e.KeyCode == Keys.F)
+            {
+                _finaleMode = !_finaleMode;
+                _timeUntilNextLaunchMs = 0;
+            }
+
+            if (e.KeyCode == Keys.T)
+                TopMost = !TopMost;
         };
 
         MouseDown += (_, e) =>
@@ -60,15 +82,85 @@ public class FireworksForm : Form
         };
     }
 
+    private void CreateMenu()
+    {
+        FlowLayoutPanel menu = new()
+        {
+            AutoSize = true,
+            BackColor = Color.FromArgb(40, 40, 40),
+            Padding = new Padding(6),
+            Location = new Point(20, 20),
+            WrapContents = false
+        };
+
+        Button startPauseButton = MakeButton("Pause");
+        Button finaleButton = MakeButton("FINALE");
+        Button topButton = MakeButton("Top: On");
+        Button exitButton = MakeButton("Exit");
+
+        startPauseButton.Click += (_, _) =>
+        {
+            _isPaused = !_isPaused;
+            startPauseButton.Text = _isPaused ? "Start" : "Pause";
+        };
+
+        finaleButton.Click += (_, _) =>
+        {
+            _finaleMode = !_finaleMode;
+            finaleButton.Text = _finaleMode ? "FINALE ON" : "FINALE";
+            _timeUntilNextLaunchMs = 0;
+        };
+
+        topButton.Click += (_, _) =>
+        {
+            TopMost = !TopMost;
+            topButton.Text = TopMost ? "Top: On" : "Top: Off";
+        };
+
+        exitButton.Click += (_, _) => Close();
+
+        menu.Controls.Add(startPauseButton);
+        menu.Controls.Add(finaleButton);
+        menu.Controls.Add(topButton);
+        menu.Controls.Add(exitButton);
+
+        Controls.Add(menu);
+        menu.BringToFront();
+    }
+
+    private Button MakeButton(string text)
+    {
+        return new Button
+        {
+            Text = text,
+            AutoSize = true,
+            FlatStyle = FlatStyle.Flat,
+            ForeColor = Color.White,
+            BackColor = Color.FromArgb(70, 70, 70),
+            Margin = new Padding(3)
+        };
+    }
+
     private void UpdateFireworks()
     {
+        if (_particles.Count > 1200)
+        {
+            _particles.RemoveRange(0, _particles.Count - 1200);
+        }
+
         const int dt = 16;
+
+        if (_isPaused)
+        {
+            Invalidate();
+            return;
+        }
 
         _timeUntilNextLaunchMs -= dt;
 
         if (_timeUntilNextLaunchMs <= 0)
         {
-            int bursts = _random.Next(1, 4);
+            int bursts = _finaleMode ? _random.Next(1, 3) : _random.Next(1, 3);
 
             for (int i = 0; i < bursts; i++)
             {
@@ -78,7 +170,9 @@ public class FireworksForm : Form
                 LaunchShell(x, Height - 40, targetY);
             }
 
-            _timeUntilNextLaunchMs = _random.Next(600, 5000);
+            _timeUntilNextLaunchMs = _finaleMode
+                ? _random.Next(250, 700)
+                : _random.Next(900, 5000);
         }
 
         for (int i = _particles.Count - 1; i >= 0; i--)
@@ -164,7 +258,7 @@ public class FireworksForm : Form
         float distance = startY - targetY;
 
         // Bigger distance = stronger launch
-        float upwardSpeed = (float)Math.Sqrt(distance * 0.18f);
+        float upwardSpeed = (float)Math.Sqrt(distance * 0.32f);
 
 
         _particles.Add(new Particle
