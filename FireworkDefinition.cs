@@ -17,12 +17,26 @@ public enum FireworkPalette
 {
     Gold,
     RedGold,
+    Sunset,
+    Patriotic,
     Ice,
     Purple,
+    Lavender,
     Pink,
     Green,
+    Emerald,
     Rainbow,
-    WhiteGlitter
+    WhiteGlitter,
+    Autumn,
+    Halloween,
+    Christmas,
+    CottonCandy,
+    Tropical,
+    Ocean,
+    Galaxy,
+    Sunrise,
+    Aurora,
+    AuroraBorealis
 }
 
 public class FireworkDefinition

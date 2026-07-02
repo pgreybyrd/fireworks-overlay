@@ -494,14 +494,200 @@ public class FireworksForm : Form
     {
         return palette switch
         {
-            FireworkPalette.Gold => new[] { Color.Gold, Color.Orange, Color.White, Color.Yellow },
-            FireworkPalette.RedGold => new[] { Color.Red, Color.OrangeRed, Color.Gold, Color.White },
-            FireworkPalette.Ice => new[] { Color.DeepSkyBlue, Color.Cyan, Color.White, Color.LightSteelBlue },
-            FireworkPalette.Purple => new[] { Color.MediumPurple, Color.Violet, Color.White, Color.HotPink },
-            FireworkPalette.Pink => new[] { Color.HotPink, Color.DeepPink, Color.White, Color.Pink },
-            FireworkPalette.Green => new[] { Color.LimeGreen, Color.SpringGreen, Color.White, Color.Cyan },
-            FireworkPalette.Rainbow => new[] { Color.Red, Color.Orange, Color.Yellow, Color.LimeGreen, Color.DeepSkyBlue, Color.MediumPurple, Color.HotPink, Color.White },
-            FireworkPalette.WhiteGlitter => new[] { Color.White, Color.Gainsboro, Color.LightYellow },
+            FireworkPalette.Gold => new[]
+            {
+                Color.Gold,
+                Color.Goldenrod,
+                Color.Yellow,
+                Color.White
+            },
+
+            FireworkPalette.RedGold => new[]
+            {
+                Color.Red,
+                Color.OrangeRed,
+                Color.Gold,
+                Color.White
+            },
+
+            FireworkPalette.Sunset => new[]
+            {
+                Color.Red,
+                Color.OrangeRed,
+                Color.Orange,
+                Color.Gold,
+                Color.Yellow
+            },
+
+            FireworkPalette.Patriotic => new[]
+            {
+                Color.Red,
+                Color.White,
+                Color.DeepSkyBlue,
+                Color.RoyalBlue
+            },
+
+            FireworkPalette.Ice => new[]
+            {
+                Color.DeepSkyBlue,
+                Color.Cyan,
+                Color.LightBlue,
+                Color.White,
+                Color.LightSteelBlue
+            },
+
+            FireworkPalette.Purple => new[]
+            {
+                Color.DarkViolet,
+                Color.MediumPurple,
+                Color.Violet,
+                Color.White,
+                Color.HotPink
+            },
+
+            FireworkPalette.Lavender => new[]
+            {
+                Color.Plum,
+                Color.Orchid,
+                Color.Thistle,
+                Color.White,
+                Color.Lavender
+            },
+
+            FireworkPalette.Pink => new[]
+            {
+                Color.DeepPink,
+                Color.HotPink,
+                Color.Pink,
+                Color.White
+            },
+
+            FireworkPalette.Green => new[]
+            {
+                Color.LimeGreen,
+                Color.SpringGreen,
+                Color.GreenYellow,
+                Color.White
+            },
+
+            FireworkPalette.Emerald => new[]
+            {
+                Color.ForestGreen,
+                Color.SeaGreen,
+                Color.MediumSeaGreen,
+                Color.SpringGreen,
+                Color.White
+            },
+
+            FireworkPalette.Rainbow => new[]
+            {
+                Color.Red,
+                Color.Orange,
+                Color.Yellow,
+                Color.LimeGreen,
+                Color.DeepSkyBlue,
+                Color.MediumPurple,
+                Color.HotPink,
+                Color.White
+            },
+
+            FireworkPalette.WhiteGlitter => new[]
+            {
+                Color.White,
+                Color.Gainsboro,
+                Color.LightYellow,
+                Color.LightGray
+            },
+
+            FireworkPalette.Autumn => new[]
+            {
+                Color.Firebrick,
+                Color.DarkOrange,
+                Color.Goldenrod,
+                Color.SaddleBrown,
+                Color.Yellow
+            },
+
+            FireworkPalette.Halloween => new[]
+            {
+                Color.Orange,
+                Color.DarkOrange,
+                Color.DarkViolet,
+                Color.Black,
+                Color.White
+            },
+
+            FireworkPalette.Christmas => new[]
+            {
+                Color.Red,
+                Color.DarkRed,
+                Color.ForestGreen,
+                Color.LimeGreen,
+                Color.White
+            },
+
+            FireworkPalette.CottonCandy => new[]
+            {
+                Color.Pink,
+                Color.LightPink,
+                Color.LightSkyBlue,
+                Color.White
+            },
+
+            FireworkPalette.Tropical => new[]
+            {
+                Color.HotPink,
+                Color.Orange,
+                Color.Yellow,
+                Color.LimeGreen,
+                Color.DeepSkyBlue
+            },
+
+            FireworkPalette.Ocean => new[]
+            {
+                Color.Aqua,
+                Color.DeepSkyBlue,
+                Color.CornflowerBlue,
+                Color.Blue,
+                Color.White
+            },
+
+            FireworkPalette.Galaxy => new[]
+            {
+                Color.MediumPurple,
+                Color.DeepSkyBlue,
+                Color.Cyan,
+                Color.White,
+                Color.HotPink
+            },
+
+            FireworkPalette.Sunrise => new[]
+            {
+                Color.Pink,
+                Color.HotPink,
+                Color.Orange,
+                Color.Gold,
+                Color.LightYellow
+            },
+
+            FireworkPalette.Aurora => new[]
+            {
+                Color.MediumPurple,
+                Color.DeepSkyBlue,
+                Color.SpringGreen,
+                Color.Yellow,
+                Color.White
+            },
+
+            FireworkPalette.AuroraBorealis => new[]
+            {
+                Color.LimeGreen,
+                Color.Cyan,
+                Color.DeepSkyBlue,
+                Color.MediumPurple,
+                Color.White
+            },
+
             _ => new[] { Color.White }
         };
     }
@@ -537,7 +723,7 @@ public class FireworksForm : Form
 
             float s = p.Size;
 
-            DrawSignature(e.Graphics);
+            //DrawSignature(e.Graphics);
 
             switch (p.Shape)
             {
