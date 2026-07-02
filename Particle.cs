@@ -27,4 +27,17 @@ public class Particle
     public bool IsShell;
     public bool HasExploded;
     public bool IsSparkle;
+
+    public FireworkType FireworkType;
+}
+
+public enum FireworkType
+{
+    Burst,
+    Ring,
+    Chrysanthemum,
+    Willow,
+    DoubleBurst,
+    Comet,
+    Crackle
 }

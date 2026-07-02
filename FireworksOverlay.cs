@@ -54,7 +54,9 @@ public class FireworksForm : Form
 
         MouseDown += (_, e) =>
         {
-            LaunchFirework(e.X, e.Y);
+            FireworkType type = (FireworkType)_random.Next(5);
+
+            LaunchFirework(e.X, e.Y, type);
         };
     }
 
@@ -73,7 +75,9 @@ public class FireworksForm : Form
                 int x = _random.Next(100, Width - 100);
                 int y = _random.Next(80, Height / 2);
 
-                LaunchFirework(x, y);
+                FireworkType type = (FireworkType)_random.Next(5);
+
+                LaunchFirework(x, y, type);
             }
 
             _timeUntilNextLaunchMs = _random.Next(600, 5000);
@@ -86,14 +90,14 @@ public class FireworksForm : Form
             p.X += p.VX;
             p.Y += p.VY;
 
-            p.VY += p.IsShell ? 0.025f : 0.04f; // gravity
+            p.VY += p.IsShell ? 0.025f : 0.045f; // gravity
             p.VX *= 0.992f;
             p.VY *= 0.992f;
 
             if (p.IsShell && !p.HasExploded && p.Y <= p.TargetY)
             {
                 p.HasExploded = true;
-                LaunchFirework(p.X, p.Y);
+                LaunchFirework(p.X, p.Y, p.FireworkType);
                 _particles.RemoveAt(i);
                 continue;
             }
@@ -106,7 +110,7 @@ public class FireworksForm : Form
             if (p.IsShell && !p.HasExploded && (p.Y <= p.TargetY || p.VY >= 0))
             {
                 p.HasExploded = true;
-                LaunchFirework(p.X, p.Y);
+                LaunchFirework(p.X, p.Y, p.FireworkType);
                 _particles.RemoveAt(i);
                 continue;
             }
@@ -144,6 +148,7 @@ public class FireworksForm : Form
         // Bigger distance = stronger launch
         float upwardSpeed = (float)Math.Sqrt(distance * 0.18f);
 
+
         _particles.Add(new Particle
         {
             X = startX,
@@ -152,6 +157,8 @@ public class FireworksForm : Form
 
             VX = (float)(_random.NextDouble() * 1.4 - 0.7),
             VY = -upwardSpeed,
+
+            FireworkType = (FireworkType)_random.Next(5),
 
             Life = 3000,
             MaxLife = 3000,
@@ -162,53 +169,163 @@ public class FireworksForm : Form
         });
     }
 
-    private void LaunchFirework(float x, float y)
+    private void LaunchFirework(float x, float y, FireworkType type)
     {
         Color[][] palettes =
         {
-            new[] { Color.Gold, Color.Orange, Color.White, Color.Yellow },
-            new[] { Color.Red, Color.OrangeRed, Color.Gold, Color.White },
-            new[] { Color.DeepSkyBlue, Color.Cyan, Color.White, Color.LightSteelBlue },
-            new[] { Color.MediumPurple, Color.Violet, Color.White, Color.HotPink },
-            new[] { Color.HotPink, Color.DeepPink, Color.White, Color.Pink },
-            new[] { Color.LimeGreen, Color.SpringGreen, Color.White, Color.Cyan },
-            new[] { Color.Red, Color.Orange, Color.Yellow, Color.LimeGreen, Color.DeepSkyBlue, Color.MediumPurple, Color.HotPink, Color.White },
-            new[] { Color.White, Color.Gainsboro, Color.LightYellow }
+        new[] { Color.Gold, Color.Orange, Color.White, Color.Yellow },
+        new[] { Color.Red, Color.OrangeRed, Color.Gold, Color.White },
+        new[] { Color.DeepSkyBlue, Color.Cyan, Color.White, Color.LightSteelBlue },
+        new[] { Color.MediumPurple, Color.Violet, Color.White, Color.HotPink },
+        new[] { Color.HotPink, Color.DeepPink, Color.White, Color.Pink },
+        new[] { Color.LimeGreen, Color.SpringGreen, Color.White, Color.Cyan },
+        new[] { Color.Red, Color.Orange, Color.Yellow, Color.LimeGreen, Color.DeepSkyBlue, Color.MediumPurple, Color.HotPink, Color.White },
+        new[] { Color.White, Color.Gainsboro, Color.LightYellow }
         };
 
         Color[] palette = _random.Next(5) == 0
-            ? palettes[6]   // rainbow
+            ? palettes[6] // rainbow
             : palettes[_random.Next(palettes.Length)];
 
+        switch (type)
+        {
+            case FireworkType.Burst:
+                CreateBurst(x, y, palette);
+                break;
+
+            case FireworkType.Ring:
+                CreateRing(x, y, palette);
+                break;
+
+            case FireworkType.Chrysanthemum:
+                CreateChrysanthemum(x, y, palette);
+                break;
+
+            case FireworkType.Willow:
+                CreateWillow(x, y, palette);
+                break;
+        }
+    }
+
+    private Color PickColor(Color[] palette, int index)
+    {
+        return index < 4
+            ? Color.White
+            : palette[_random.Next(palette.Length)];
+    }
+
+    private ParticleShape PickShape()
+    {
+        return (ParticleShape)_random.Next(0, 3);
+    }
+
+    private void AddExplosionParticle(
+        float x,
+        float y,
+        float vx,
+        float vy,
+        int life,
+        int maxLife,
+        float size,
+        Color color,
+        ParticleShape shape)
+    {
+        _particles.Add(new Particle
+        {
+            X = x,
+            Y = y,
+            VX = vx,
+            VY = vy,
+            Life = life,
+            MaxLife = maxLife,
+            Size = size,
+            Color = color,
+            Shape = shape
+        });
+    }
+
+    private void CreateBurst(float x, float y, Color[] palette)
+    {
         int count = _random.Next(70, 130);
-        int style = _random.Next(3);
 
         for (int i = 0; i < count; i++)
         {
-            double angle = style == 0
-                ? _random.NextDouble() * Math.PI * 2
-                : (Math.PI * 2 / count) * i + _random.NextDouble() * 0.15;
+            double angle = _random.NextDouble() * Math.PI * 2;
+            double speed = 1.5 + _random.NextDouble() * 5.8;
 
-            double speed = style == 2
-                ? 2.5 + _random.NextDouble() * 3.0
-                : 1.5 + _random.NextDouble() * 5.5;
+            AddExplosionParticle(
+                x, y,
+                (float)(Math.Cos(angle) * speed),
+                (float)(Math.Sin(angle) * speed),
+                _random.Next(1200, 2400),
+                2400,
+                _random.Next(2, 6),
+                PickColor(palette, i),
+                PickShape());
+        }
+    }
 
-            Color particleColor = i < 4
-                ? Color.White
-                : palette[_random.Next(palette.Length)];
+    private void CreateRing(float x, float y, Color[] palette)
+    {
+        int count = _random.Next(70, 110);
+        double baseSpeed = 4.0 + _random.NextDouble() * 1.5;
 
-            _particles.Add(new Particle
-            {
-                X = x,
-                Y = y,
-                VX = (float)(Math.Cos(angle) * speed),
-                VY = (float)(Math.Sin(angle) * speed),
-                Life = _random.Next(1200, 2400),
-                MaxLife = 2400,
-                Size = _random.Next(2, 6),
-                Color = particleColor,
-                Shape = (ParticleShape)_random.Next(0, 3)
-            });
+        for (int i = 0; i < count; i++)
+        {
+            double angle = Math.PI * 2 * i / count;
+            double speed = baseSpeed + _random.NextDouble() * 0.3;
+
+            AddExplosionParticle(
+                x, y,
+                (float)(Math.Cos(angle) * speed),
+                (float)(Math.Sin(angle) * speed),
+                _random.Next(1300, 2200),
+                2200,
+                _random.Next(2, 5),
+                PickColor(palette, i),
+                PickShape());
+        }
+    }
+
+    private void CreateChrysanthemum(float x, float y, Color[] palette)
+    {
+        int count = _random.Next(120, 190);
+
+        for (int i = 0; i < count; i++)
+        {
+            double angle = Math.PI * 2 * i / count + (_random.NextDouble() * 0.08);
+            double speed = 2.2 + _random.NextDouble() * 4.2;
+
+            AddExplosionParticle(
+                x, y,
+                (float)(Math.Cos(angle) * speed),
+                (float)(Math.Sin(angle) * speed),
+                _random.Next(1500, 2800),
+                2800,
+                _random.Next(2, 6),
+                PickColor(palette, i),
+                PickShape());
+        }
+    }
+
+    private void CreateWillow(float x, float y, Color[] palette)
+    {
+        int count = _random.Next(80, 130);
+
+        for (int i = 0; i < count; i++)
+        {
+            double angle = Math.PI * 2 * i / count + _random.NextDouble() * 0.1;
+            double speed = 1.4 + _random.NextDouble() * 2.2;
+
+            AddExplosionParticle(
+                x, y,
+                (float)(Math.Cos(angle) * speed),
+                (float)(Math.Sin(angle) * speed - 1.2f),
+                _random.Next(2400, 4200),
+                4200,
+                _random.Next(2, 5),
+                PickColor(palette, i),
+                ParticleShape.Plus);
         }
     }
 
