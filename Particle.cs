@@ -24,6 +24,9 @@ public class Particle
     public Color Color;
     public ParticleShape Shape;
 
+    public Color StartColor;
+    public Color EndColor;
+
     public bool IsShell;
     public bool HasExploded;
     public bool IsSparkle;

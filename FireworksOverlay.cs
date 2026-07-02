@@ -350,8 +350,22 @@ public class FireworksForm : Form
             Color = color,
             Shape = shape,
             Definition = def,
-            CanReexplode = canReexplode
+            CanReexplode = canReexplode,
+            StartColor = color,
+            EndColor = GetFadeColor(color)
         });
+    }
+
+    private Color GetFadeColor(Color color)
+    {
+        if (color.GetBrightness() > 0.75f)
+            return Color.Gold;
+
+        return Color.FromArgb(
+            Math.Min(255, color.R + 60),
+            Math.Min(255, color.G + 35),
+            Math.Min(255, color.B + 10)
+        );
     }
 
     private void CreateBurst(float x, float y, FireworkDefinition def, Color[] palette)
@@ -788,6 +802,17 @@ public class FireworksForm : Form
         g.DrawString(text, font, brush, x, y);
     }
 
+    private Color BlendColors(Color from, Color to, float amount)
+    {
+        amount = Math.Clamp(amount, 0f, 1f);
+
+        int r = (int)(from.R + (to.R - from.R) * amount);
+        int g = (int)(from.G + (to.G - from.G) * amount);
+        int b = (int)(from.B + (to.B - from.B) * amount);
+
+        return Color.FromArgb(r, g, b);
+    }
+
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
@@ -799,8 +824,15 @@ public class FireworksForm : Form
             float alphaPercent = Math.Max(0, p.Life / p.MaxLife);
             int alpha = (int)(255 * alphaPercent);
 
-            using var pen = new Pen(Color.FromArgb(alpha, p.Color), 2);
-            using var brush = new SolidBrush(Color.FromArgb(alpha, p.Color));
+            float lifePercent = Math.Max(0, p.Life / p.MaxLife);
+            float fadeAmount = 1f - lifePercent;
+
+            Color displayColor = BlendColors(p.StartColor == Color.Empty ? p.Color : p.StartColor,
+                                             p.EndColor == Color.Empty ? p.Color : p.EndColor,
+                                             fadeAmount);
+
+            using var pen = new Pen(Color.FromArgb(alpha, displayColor), 2);
+            using var brush = new SolidBrush(Color.FromArgb(alpha, displayColor));
 
             float s = p.Size;
 
