@@ -25,9 +25,13 @@ public class FireworksForm : Form
         FormBorderStyle = FormBorderStyle.None;
         StartPosition = FormStartPosition.Manual;
 
+        /* my personal setup
         Screen targetScreen = Screen.AllScreens
             .OrderByDescending(s => s.Bounds.Height)
             .First();
+        */
+        Screen targetScreen = Screen.AllScreens
+            .First(s => s.Primary);
 
         Bounds = targetScreen.Bounds;
 
