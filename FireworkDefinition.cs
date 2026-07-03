@@ -51,6 +51,16 @@ public enum ColorStyle
     CoreToEdge,     // bright center fading to edges
 }
 
+public enum GlowShape
+{
+    Plus,
+    Cross,
+    Star,
+    Horizontal,
+    Vertical,
+    None
+}
+
 public class FireworkDefinition
 {
     public FireworkType Type { get; set; }
@@ -79,4 +89,6 @@ public class FireworkDefinition
     public ColorStyle ColorStyle { get; set; } = ColorStyle.Balanced;
     public Color PrimaryColor { get; set; } = Color.Empty;
     public Color AccentColor { get; set; } = Color.Empty;
+
+
 }

@@ -92,32 +92,85 @@ public class FireworksForm : Form
 
     private void DrawParticleGlow(Graphics g, Particle p, Color glowColor, int alpha)
     {
-        if (!_glowEnabled || p.Shape == ParticleShape.Shell)
+        if (!_glowEnabled || p.Shape == ParticleShape.Shell || p.GlowShape == GlowShape.None)
             return;
 
         float lifePercent = Math.Max(0, p.Life / p.MaxLife);
 
-        if (lifePercent < 0.35f)
+        if (lifePercent < 0.30f)
             return;
 
-        int glowAlpha = (int)(alpha * 0.35f);
-        float s = p.Size * 3.5f;
+        // twinkle: some glows blink lightly, but not too obnoxiously
+        if (p.GlowShape is GlowShape.Star or GlowShape.Cross)
+        {
+            int blink = (Environment.TickCount / 90 + p.GetHashCode()) % 4;
+            if (blink == 0)
+                return;
+        }
 
-        using Pen glowPen = new(Color.FromArgb(glowAlpha, glowColor), 1);
+        int glowAlpha = (int)(alpha * 0.40f);
+        float s = p.Size * 3.6f;
 
-        g.DrawLine(glowPen, p.X - s, p.Y, p.X + s, p.Y);
-        g.DrawLine(glowPen, p.X, p.Y - s, p.X, p.Y + s);
-
+        using Pen mainPen = new(Color.FromArgb(glowAlpha, glowColor), 1);
         using Pen faintPen = new(Color.FromArgb(glowAlpha / 2, glowColor), 1);
 
-        g.DrawLine(faintPen, p.X - s * 0.7f, p.Y - s * 0.7f, p.X + s * 0.7f, p.Y + s * 0.7f);
-        g.DrawLine(faintPen, p.X - s * 0.7f, p.Y + s * 0.7f, p.X + s * 0.7f, p.Y - s * 0.7f);
+        switch (p.GlowShape)
+        {
+            case GlowShape.Plus:
+                DrawPlusGlow(g, mainPen, p.X, p.Y, s);
+                break;
+
+            case GlowShape.Cross:
+                DrawCrossGlow(g, mainPen, p.X, p.Y, s);
+                break;
+
+            case GlowShape.Star:
+                DrawPlusGlow(g, mainPen, p.X, p.Y, s);
+                DrawCrossGlow(g, faintPen, p.X, p.Y, s * 0.75f);
+                break;
+
+            case GlowShape.Horizontal:
+                g.DrawLine(mainPen, p.X - s, p.Y, p.X + s, p.Y);
+                break;
+
+            case GlowShape.Vertical:
+                g.DrawLine(mainPen, p.X, p.Y - s, p.X, p.Y + s);
+                break;
+        }
     }
 
-    private void DrawGlowCircle(Graphics g, float x, float y, float size, Color color)
+    private void DrawPlusGlow(Graphics g, Pen pen, float x, float y, float s)
     {
-        using Brush brush = new SolidBrush(color);
-        g.FillEllipse(brush, x - size / 2, y - size / 2, size, size);
+        g.DrawLine(pen, x - s, y, x + s, y);
+        g.DrawLine(pen, x, y - s, x, y + s);
+    }
+
+    private void DrawCrossGlow(Graphics g, Pen pen, float x, float y, float s)
+    {
+        g.DrawLine(pen, x - s, y - s, x + s, y + s);
+        g.DrawLine(pen, x - s, y + s, x + s, y - s);
+    }
+
+    private GlowShape PickGlowShape()
+    {
+        double roll = _random.NextDouble();
+
+        if (roll < 0.35)
+            return GlowShape.None;
+
+        if (roll < 0.55)
+            return GlowShape.Plus;
+
+        if (roll < 0.72)
+            return GlowShape.Cross;
+
+        if (roll < 0.88)
+            return GlowShape.Star;
+
+        if (roll < 0.94)
+            return GlowShape.Horizontal;
+
+        return GlowShape.Vertical;
     }
 
     private void CreateMenu()
@@ -296,7 +349,8 @@ public class FireworksForm : Form
             MaxLife = 700,
             Size = _random.Next(2, 5),
             Color = Color.White,
-            Shape = _random.NextDouble() < 0.5 ? ParticleShape.Plus : ParticleShape.Star
+            Shape = _random.NextDouble() < 0.5 ? ParticleShape.Plus : ParticleShape.Star,
+            GlowShape = _random.NextDouble() < 0.5 ? GlowShape.Star : GlowShape.Plus
         });
     }
 
@@ -387,7 +441,8 @@ public class FireworksForm : Form
             Definition = def,
             CanReexplode = canReexplode,
             StartColor = color,
-            EndColor = GetFadeColor(color)
+            EndColor = GetFadeColor(color),
+            GlowShape = PickGlowShape()
         });
     }
 
