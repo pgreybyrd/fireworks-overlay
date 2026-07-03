@@ -173,6 +173,27 @@ public class FireworksForm : Form
         return GlowShape.Vertical;
     }
 
+    private void AddSmoke(float x, float y)
+    {
+        _particles.Add(new Particle
+        {
+            IsSmoke = true,
+
+            X = x,
+            Y = y,
+
+            VX = (float)(_random.NextDouble() - 0.5) * 0.25f,
+            VY = -(float)_random.NextDouble() * 0.2f,
+
+            Life = 700,
+            MaxLife = 700,
+
+            Size = _random.Next(2, 4),
+
+            Color = Color.LightGray
+        });
+    }
+
     private void CreateMenu()
     {
         FlowLayoutPanel menu = new()
@@ -273,9 +294,23 @@ public class FireworksForm : Form
             p.X += p.VX;
             p.Y += p.VY;
 
+            if (p.IsShell && _random.NextDouble() < 0.03)
+            {
+                AddSmoke(p.X, p.Y + 10);
+            }
+
             p.VY += p.IsShell ? 0.025f : (p.Definition?.Gravity ?? 0.045f);
             p.VX *= 0.992f;
             p.VY *= 0.992f;
+
+            if (p.IsSmoke)
+            {
+                p.VY -= 0.004f;
+
+                p.VX *= 0.995f;
+
+                p.Size += 0.003f;
+            }
 
             if (p.Definition?.Type == FireworkType.Willow)
             {
@@ -322,7 +357,7 @@ public class FireworksForm : Form
                 AddSparkle(p.X, p.Y, Color.White);
 
             if (!p.IsShell && !p.IsSparkle && p.Definition?.HasSparkles == true &&
-                p.Life < p.MaxLife * 0.35f && _random.NextDouble() < 0.008)
+                p.Life < p.MaxLife * 0.12f && _random.NextDouble() < 0.008)
             {
                 AddSparkle(p.X, p.Y, p.Color);
             }

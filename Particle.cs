@@ -34,6 +34,7 @@ public class Particle
     public bool IsSparkle;
     public bool CanReexplode;
     public bool HasReexploded;
+    public bool IsSmoke;
 
     public FireworkType FireworkType;
     public FireworkDefinition? Definition;
