@@ -60,6 +60,8 @@ This is a small finished desktop toy/project. Future updates may add:
 ## Screenshots
 ![Fireworks](Screenshots/demo_00.gif)
 
+![Fireworks2](Screenshots/demo_01.gif)
+
 ## Credits
 
 Created by **Paulina Grey**.
