@@ -18,12 +18,12 @@ Built in C# with Windows Forms, Paulina's Fireworks launches randomized firework
 
 ## Controls
 
-- **Space** AND/OR **MouseClick** — Launch a firework manually
-- **F** — Toggle finale mode
-- **P** — Pause / resume
-- **G** — Toggle glow/glints
-- **T** — Toggle always-on-top
-- **Esc** — Exit
+- **Space** AND/OR **MouseClick** â€” Launch a firework manually
+- **F** â€” Toggle finale mode
+- **P** â€” Pause / resume
+- **G** â€” Toggle glow/glints
+- **T** â€” Toggle always-on-top
+- **Esc** â€” Exit
 
 ## Notes
 
@@ -56,6 +56,9 @@ This is a small finished desktop toy/project. Future updates may add:
 - More firework shapes
 - Optional menu UI
 - Background music
+
+## Screenshots
+![Fireworks](Screenshots/demo_00.gif)
 
 ## Credits
 
